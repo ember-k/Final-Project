@@ -13,26 +13,26 @@ type of fish in addition to the number of fish caught.
 # Phase 1
 - [ ] Play screen: the opening window with a high score counter and a play button
 - [ ] Setting: Program the aquatic background
-- [] Hook exists: at the start of the round, make the hook appear to sink in the water to the middle
+- [ ] Hook exists: at the start of the round, make the hook appear to sink in the water to the middle
   of the screen and remain vertically centered for the remainder of the game.
-- [] Hook movement: The player can drag the hook left and right
-- [] Screen limits: the hook can't be moved off screen (the hook can't move further once it hits the side)
-- [] Fish exist: Fish appear from either side of the screen
+- [ ] Hook movement: The player can drag the hook left and right
+- [ ] Screen limits: the hook can't be moved off screen (the hook can't move further once it hits the side)
+- [ ] Fish exist: Fish appear from either side of the screen
 
 # Phase 2
-- [] Fish move: fish move left and right across the screen while moving generally downwards
-- [] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
-- [] Screen limits: fish can't move off screen
-- [] fish collision: When the hook touches a fish, points are gained and the type & number of fish collisions are recorded.
-- [] Max collisions: Only a certain number of fish can be caught before the hook is full
+- [ ] Fish move: fish move left and right across the screen while moving generally downwards
+- [ ] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
+- [ ] Screen limits: fish can't move off screen
+- [ ] fish collision: When the hook touches a fish, points are gained and the type & number of fish collisions are recorded.
+- [ ] Max collisions: Only a certain number of fish can be caught before the hook is full
 
 
 # Phase 3
-- [] Hooked Fish movement: When fish collide with the hook, they are relocated to align their movements with the hook.
+- [ ] Hooked Fish movement: When fish collide with the hook, they are relocated to align their movements with the hook.
   (They appear to be hanging on the hook and get dragged with the hook like in real fishing)
-- [] Water's Surace: After a certain amount of time, the surface of the water should descend from the top of the screen until it
+- [ ] Water's Surace: After a certain amount of time, the surface of the water should descend from the top of the screen until it
   collides with the hook, then the game pauses
-- [] End of Round: A message displays when the hook collides with the water's surface. The number and type of fish that were caught are
+- [ ] End of Round: A message displays when the hook collides with the water's surface. The number and type of fish that were caught are
   displayed along with the total points that were earned
-- [] Update Play screen: Play screen is updated with cumulative points and the player is given the option to play another round.
-- [] (Nice to have) Rare fish: rare fish are added that are smaller and/or move across the screen faster which are worth extra points
+- [ ] Update Play screen: Play screen is updated with cumulative points and the player is given the option to play another round.
+- [ ] (Nice to have) Rare fish: rare fish are added that are smaller and/or move across the screen faster which are worth extra points
