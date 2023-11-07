@@ -11,8 +11,8 @@ catch as many fish as possible before the hook is reeled back to the surface (pr
 type of fish in addition to the number of fish caught.
 
 # Phase 1
-- [] Play screen: the opening window with a high score counter and a play button
-- [] Setting: Program the aquatic background
+- [ ] Play screen: the opening window with a high score counter and a play button
+- [ ] Setting: Program the aquatic background
 - [] Hook exists: at the start of the round, make the hook appear to sink in the water to the middle
   of the screen and remain vertically centered for the remainder of the game.
 - [] Hook movement: The player can drag the hook left and right
