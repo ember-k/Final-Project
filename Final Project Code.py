@@ -8,7 +8,7 @@ HOOK_SPEED = 10
 - [x] Hook exists: it exists on the screen
   of the screen and remain vertically centered for the remainder of the game.
 - [ ] Hook movement: The player can drag the hook left and right
-- [ ] Screen limits: the hook can't be moved off screen (the hook can't move further once it hits the side)
+- [x] Screen limits: the hook can't be moved off screen (the hook can't move further once it hits the side)
 - [ ] Fish exist: Fish appear from either side of the screen
 """
 # https://images.emojiterra.com/openmoji/v13.1/512px/1fa9d.png
