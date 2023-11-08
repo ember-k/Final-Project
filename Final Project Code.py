@@ -43,14 +43,15 @@ def move_hook(world: World, direction: int):
     world.hook.x += world.hook_speed * direction
 
 def hook_at_left_edge(world: World):
-    if world.hook.x < 0:
+    """Prevents the hook from moving beyond the left wall of the window"""
+    if world.hook.x < world.hook.width / 2.2:
         world.hook_move_left = False
         return True
     else:
         return False
 def hook_at_right_edge(world: World):
-    """Handle the hook when it reaches the right wall of the window"""
-    if world.hook.x > get_width():
+    """Prevents the hook from moving beyond the right wall of the window"""
+    if world.hook.x > get_width() - world.hook.width / 3:
         world.hook_move_right = False
         return True
     else:
