@@ -5,9 +5,8 @@ HOOK_SPEED = 10
 
 """
 - [ ] Setting: Program the aquatic background
-- [x] Hook exists: it exists on the screen
-  of the screen and remain vertically centered for the remainder of the game.
-- [ ] Hook movement: The player can drag the hook left and right
+- [x] Hook exists: the hook exists on the screen and remains vertically centered for the duration of the game.
+- [ ] Hook movement: The player can use the arrow keys to move the hook left and right (i might try to get dragging to work as a bonus in phase 3)
 - [x] Screen limits: the hook can't be moved off screen (the hook can't move further once it hits the side)
 - [ ] Fish exist: Fish appear from either side of the screen
 """
@@ -15,6 +14,7 @@ HOOK_SPEED = 10
 
 @dataclass
 class World:
+    water: DesignerObject
     hook: DesignerObject
     hook_move_left: bool
     hook_move_right: bool
@@ -23,13 +23,13 @@ class World:
 
 def create_world() -> World:
     """Create the world"""
-    return World(create_hook(), False, False, HOOK_SPEED)
-"""
+    return World(create_background(), create_hook(), False, False, HOOK_SPEED)
+
 def create_background() -> DesignerObject:
-    ""Create the water""
+    """Create the water"""
     water = rectangle("cornflowerblue", get_window_width(), get_window_height())
     return water
-    """
+
 
 def create_hook() -> DesignerObject:
     """Create the hook"""
@@ -44,14 +44,14 @@ def move_hook(world: World, direction: int):
 
 def hook_at_left_edge(world: World):
     """Prevents the hook from moving beyond the left wall of the window"""
-    if world.hook.x < world.hook.width / 2.2:
+    if world.hook.x < world.hook.width / 2.9:
         world.hook_move_left = False
         return True
     else:
         return False
 def hook_at_right_edge(world: World):
     """Prevents the hook from moving beyond the right wall of the window"""
-    if world.hook.x > get_width() - world.hook.width / 3:
+    if world.hook.x > get_width() - world.hook.width / 4.5:
         world.hook_move_right = False
         return True
     else:
@@ -81,7 +81,6 @@ def keys_realeased(world:World, key:str):
         world.hook_move_left = False
     elif key == 'right':
         world.hook_move_right = False
-
 
 
 
