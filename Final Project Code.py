@@ -16,18 +16,20 @@ HOOK_SPEED = 10
 class World:
     water: DesignerObject
     hook: DesignerObject
+    fish: list[DesignerObject]
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
 
 
+
 def create_world() -> World:
     """Create the world"""
-    return World(create_background(), create_hook(), False, False, HOOK_SPEED)
+    return World(create_background(), create_hook(), create_fish(), False, False, HOOK_SPEED)
 
 def create_background() -> DesignerObject:
     """Create the water"""
-    water = rectangle("cornflowerblue", get_window_width(), get_window_height())
+    water = rectangle("deepskyblue", get_window_width(), get_window_height())
     return water
 
 
@@ -35,7 +37,7 @@ def create_hook() -> DesignerObject:
     """Create the hook"""
     hook = image("https://images.emojiterra.com/openmoji/v13.1/512px/1fa9d.png")
     shrink(hook, 3)
-    hook.anchor = "center"
+    hook.anchor = "midtop"
     return hook
 
 def move_hook(world: World, direction: int):
@@ -82,6 +84,24 @@ def keys_realeased(world:World, key:str):
     elif key == 'right':
         world.hook_move_right = False
 
+def create_fish() -> DesignerObject:
+    """Create the fish"""
+    fish = []
+    for a_fish in range(6):
+        a_fish = emoji("tropical fish")
+        a_fish.scale = 1.5
+        #a_fish.anchor = "midleft" # or midright
+        a_fish.x = randint(0, get_width() / 10) * 10
+        a_fish.y = randint(0, get_height() * (1/3))
+        if a_fish.x < get_width() / 2:
+            a_fish.flip_x
+        fish.append(a_fish)
+    return fish
+
+"""
+def spawn_fish(world: World):
+    ""Creates fish at random times if there aren't enough fish""
+"""
 
 
 
