@@ -13,11 +13,19 @@ HOOK_SPEED = 10
 # https://images.emojiterra.com/openmoji/v13.1/512px/1fa9d.png
 
 @dataclass
+class Screen:
+    background: DesignerObject # Rectangle
+    element1: DesignerObject #text
+    element2: DesignerObject #image or emoji
+    element3: DesignerObject #test
+
+
+@dataclass
 class World:
     water: DesignerObject
     hook: DesignerObject
     fish: list[DesignerObject]
-    start_page: DesignerObject
+    start_page: Screen
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
@@ -29,14 +37,23 @@ def create_world() -> World:
     return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED)
 
 def create_start_page() -> DesignerObject:
+    """
     start_page = rectangle("yellow", get_width() * 0.8, get_height() * 0.8)
     start_page.anchor = 'center'
-    text("black", "FISHING GAME", 15, None, None, "center")
+    text("black", "FISHING GAME", 15, None, None, "center", Text.DEFAULT_FONT_NAME)
+    """
+    start_page = Screen(rectangle("yellow", get_width() * 0.8, get_height() * 0.8),
+                        text("black", "FISHING GAME", 45, None, get_height() * (1/3), "midbottom", Text.DEFAULT_FONT_NAME),
+                        emoji("tropical fish"),
+                        text("black", "Press the space bar to play", 15, None, get_height() * (2/3), "midtop", Text.DEFAULT_FONT_NAME))
     return start_page
 
 def hide_start_page(world: World, key: str):
     if key == "space":
-        world.start_page.visible = False
+        world.start_page.background.visible = False
+        world.start_page.element1.visible = False
+        world.start_page.element2.visible = False
+        world.start_page.element3.visible = False
 
 def create_background() -> DesignerObject:
     """Create the water"""
@@ -80,8 +97,6 @@ def set_direction(world: World):
         move_hook(world, 0)
 
 
-
-
 def keys_down(world:World, key:str):
     if key == "left":
         world.hook_move_left = True
@@ -98,15 +113,16 @@ def keys_realeased(world:World, key:str):
 def create_fish() -> DesignerObject:
     """Create the fish"""
     fish = []
-    for index, a_fish in enumerate(range(6)):
+    for index, a_fish in enumerate(range(8)):
         a_fish = emoji("tropical fish")
         a_fish.scale = 1.5
-        a_fish.y = randint(0, get_height() * (1/3)) + 10
-        if index < 3:
-            a_fish.x = randint(0, get_width() / 10)
+        if index < 4:
+            a_fish.y = randint(0, 20) + 80 * index
+            a_fish.x = randint(0, get_width() // 9)
             a_fish.flip_x = True
         else:
-            a_fish.x = randint(get_width() // 1.2, get_width())
+            a_fish.y = randint(0, 20) + 80 * (8-index) #a_fish.y = randint(40 * (6-index), 40 * ((6-index) + 1)) + 20
+            a_fish.x = randint(get_width() - get_width() // 9, get_width())
         fish.append(a_fish)
     return fish
 
