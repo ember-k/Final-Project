@@ -11,13 +11,13 @@ catch as many fish as possible before the hook is reeled back to the surface (pr
 type of fish in addition to the number of fish caught.
 
 # Phase 1
-- [ ] Play screen: the opening window with a high score counter and a play button
-- [ ] Setting: Program the aquatic background
-- [ ] Hook exists: at the start of the round, make the hook appear to sink in the water to the middle
-  of the screen and remain vertically centered for the remainder of the game.
-- [ ] Hook movement: The player can drag the hook left and right
-- [ ] Screen limits: the hook can't be moved off screen (the hook can't move further once it hits the side)
-- [ ] Fish exist: Fish appear from either side of the screen
+- [x] Play screen: the opening window with a high score counter and a play button (player presses the space bar)
+- [x] Setting: Program the aquatic background
+- [ ] Hook exists: at the start of the round and can't be moved vertically from its position (only right or left) 
+(My TA suggested that I don't do the animation of the hook descending)
+- [x] Hook movement: The player can use the arrow keys to move the hook left and right (I might try to get dragging to work as a bonus in phase 3)
+- [x] Screen limits: the hook can't be moved off-screen (the hook can't move further once it hits the side)
+- [x] Fish exist: Fish appear from either side of the screen
 
 # Phase 2
 - [ ] Fish move: fish move left and right across the screen while moving generally downwards

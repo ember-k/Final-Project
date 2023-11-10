@@ -3,26 +3,15 @@ from designer import *
 from random import randint
 HOOK_SPEED = 10
 
-"""
-- [ ] Setting: Program the aquatic background
-- [x] Hook exists: the hook exists on the screen and remains vertically centered for the duration of the game.
-- [ ] Hook movement: The player can use the arrow keys to move the hook left and right (i might try to get dragging to work as a bonus in phase 3)
-- [x] Screen limits: the hook can't be moved off screen (the hook can't move further once it hits the side)
-- [ ] Fish exist: Fish appear from either side of the screen
-"""
-# https://images.emojiterra.com/openmoji/v13.1/512px/1fa9d.png
-
 @dataclass
 class Screen:
     background: DesignerObject # Rectangle
-    element1: DesignerObject #text
-    element2: DesignerObject #image or emoji
-    element3: DesignerObject #test
+    elements: list[DesignerObject] #text
 
 
 @dataclass
 class World:
-    water: DesignerObject
+    aquatic_background: Screen
     hook: DesignerObject
     fish: list[DesignerObject]
     start_page: Screen
@@ -37,28 +26,25 @@ def create_world() -> World:
     return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED)
 
 def create_start_page() -> DesignerObject:
-    """
-    start_page = rectangle("yellow", get_width() * 0.8, get_height() * 0.8)
-    start_page.anchor = 'center'
-    text("black", "FISHING GAME", 15, None, None, "center", Text.DEFAULT_FONT_NAME)
-    """
     start_page = Screen(rectangle("yellow", get_width() * 0.8, get_height() * 0.8),
-                        text("black", "FISHING GAME", 45, None, get_height() * (1/3), "midbottom", Text.DEFAULT_FONT_NAME),
+                        [text("black", "FISHING GAME", 45, None, get_height() * (1/3), "midbottom", Text.DEFAULT_FONT_NAME),
                         emoji("tropical fish"),
-                        text("black", "Press the space bar to play", 15, None, get_height() * (2/3), "midtop", Text.DEFAULT_FONT_NAME))
+                        text("black", "Press the space bar to play", 15, None, get_height() * (2/3), "midtop", Text.DEFAULT_FONT_NAME)])
     return start_page
 
 def hide_start_page(world: World, key: str):
     if key == "space":
         world.start_page.background.visible = False
-        world.start_page.element1.visible = False
-        world.start_page.element2.visible = False
-        world.start_page.element3.visible = False
+        for element in world.start_page.elements:
+            element.visible = False
+    return
 
 def create_background() -> DesignerObject:
-    """Create the water"""
-    water = rectangle("deepskyblue", get_width(), get_height())
-    return water
+    """Create the aquatic background"""
+    aquatic_background = Screen(rectangle("deepskyblue", get_width(), get_height()),
+                                [image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png", get_width() * 0.8, get_height() + 20),
+                                image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png", get_width() - get_width() * 0.82, get_height() + 20)])
+    return aquatic_background
 
 
 def create_hook() -> DesignerObject:
@@ -111,7 +97,7 @@ def keys_realeased(world:World, key:str):
         world.hook_move_right = False
 
 def create_fish() -> DesignerObject:
-    """Create the fish"""
+    """Create the fish at the two sides of the window"""
     fish = []
     for index, a_fish in enumerate(range(8)):
         a_fish = emoji("tropical fish")
