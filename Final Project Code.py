@@ -17,6 +17,7 @@ class World:
     water: DesignerObject
     hook: DesignerObject
     fish: list[DesignerObject]
+    start_page: DesignerObject
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
@@ -25,11 +26,21 @@ class World:
 
 def create_world() -> World:
     """Create the world"""
-    return World(create_background(), create_hook(), create_fish(), False, False, HOOK_SPEED)
+    return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED)
+
+def create_start_page() -> DesignerObject:
+    start_page = rectangle("yellow", get_width() * 0.8, get_height() * 0.8)
+    start_page.anchor = 'center'
+    text("black", "FISHING GAME", 15, None, None, "center")
+    return start_page
+
+def hide_start_page(world: World, key: str):
+    if key == "space":
+        world.start_page.visible = False
 
 def create_background() -> DesignerObject:
     """Create the water"""
-    water = rectangle("deepskyblue", get_window_width(), get_window_height())
+    water = rectangle("deepskyblue", get_width(), get_height())
     return water
 
 
@@ -87,26 +98,23 @@ def keys_realeased(world:World, key:str):
 def create_fish() -> DesignerObject:
     """Create the fish"""
     fish = []
-    for a_fish in range(6):
+    for index, a_fish in enumerate(range(6)):
         a_fish = emoji("tropical fish")
         a_fish.scale = 1.5
-        #a_fish.anchor = "midleft" # or midright
-        a_fish.x = randint(0, get_width() / 10) * 10
-        a_fish.y = randint(0, get_height() * (1/3))
-        if a_fish.x < get_width() / 2:
-            a_fish.flip_x
+        a_fish.y = randint(0, get_height() * (1/3)) + 10
+        if index < 3:
+            a_fish.x = randint(0, get_width() / 10)
+            a_fish.flip_x = True
+        else:
+            a_fish.x = randint(get_width() // 1.2, get_width())
         fish.append(a_fish)
     return fish
-
-"""
-def spawn_fish(world: World):
-    ""Creates fish at random times if there aren't enough fish""
-"""
 
 
 
 
 when('starting', create_world)
+when('typing', hide_start_page)
 when('typing', keys_down)
 when('done typing', keys_realeased)
 when('updating', set_direction)
