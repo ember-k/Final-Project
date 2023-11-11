@@ -13,8 +13,8 @@ type of fish in addition to the number of fish caught.
 # Phase 1
 - [x] Play screen: the opening window with a high score counter and a play button (player presses the space bar)
 - [x] Setting: Program the aquatic background
-- [ ] Hook exists: at the start of the round and can't be moved vertically from its position (only right or left) 
-(My TA suggested that I don't do the animation of the hook descending)
+- [x] Hook exists: at the start of the round and can't be moved vertically from its position (only right or left) 
+(My TA suggested that I make the animation of the hook descending a nice-to-get-to bonus step in Phase 3)
 - [x] Hook movement: The player can use the arrow keys to move the hook left and right (I might try to get dragging to work as a bonus in phase 3)
 - [x] Screen limits: the hook can't be moved off-screen (the hook can't move further once it hits the side)
 - [x] Fish exist: Fish appear from either side of the screen
@@ -36,3 +36,5 @@ type of fish in addition to the number of fish caught.
   displayed along with the total points that were earned
 - [ ] Update Play screen: Play screen is updated with cumulative points and the player is given the option to play another round.
 - [ ] (Nice to have) Rare fish: rare fish are added that are smaller and/or move across the screen faster which are worth extra points
+- [ ] (Nice to have) Hook animation: animation of the hook descending after the start screen disappears
+- [ ] (Nice to have) Drag the Hook: Instead of using arrow keys I can have the hook follow where the player drags the mouse
