@@ -2,7 +2,17 @@ from dataclasses import dataclass
 from designer import *
 from random import randint
 
+"""
+# Phase 2
+- [ ] Fish move: fish move left and right across the screen while moving generally downwards
+- [ ] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
+- [ ] Screen limits: fish can't move off screen
+- [ ] fish collision: When the hook touches a fish, points are gained and the type & number of fish collisions are recorded.
+- [ ] Max collisions: Only a certain number of fish can be caught before the hook is full
+"""
+
 HOOK_SPEED = 10
+FISH_SPEED = 11
 @dataclass
 class Screen:
     background: DesignerObject # Rectangle
@@ -18,6 +28,7 @@ class World:
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
+    fish_speed: int
 
 
 
@@ -26,7 +37,7 @@ def create_world() -> World:
     Creates the world with all necessary attributes of the World dataclass
     :return World: the game's world instance
     """
-    return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED)
+    return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED, FISH_SPEED)
 
 def create_start_page() -> DesignerObject:
     """
@@ -165,6 +176,26 @@ def create_fish() -> DesignerObject:
         fish.append(a_fish)
     return fish
 
+def move_fish_horizontally(world: World):
+    # direction matters (if it's flipped)
+    for fish in world.fish:
+        fish.x += world.fish_speed
+
+def head_left(world: World):
+    world.fish_speed = -FISH_SPEED
+    for fish in world.fish:
+        fish.flip_x = False
+
+def head_right(world: World):
+    world.fish_speed = FISH_SPEED
+    for fish in world.fish:
+        fish.flip_x = True
+def bounce_fish(world: World):
+    for fish in world.fish:
+        if fish.x > get_width():
+            head_left(world)
+        elif fish.x < 0:
+            head_right(world)
 
 
 
@@ -173,4 +204,6 @@ when('typing', hide_start_page)
 when('typing', keys_down)
 when('done typing', keys_realeased)
 when('updating', set_direction)
+when("updating", move_fish_horizontally)
+#when("updating", bounce_fish)
 start()
