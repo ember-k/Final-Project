@@ -12,7 +12,8 @@ from random import randint
 """
 
 HOOK_SPEED = 10
-FISH_SPEED = 11
+FISH_SPEED = 3
+DOWN_SPEED = 3
 @dataclass
 class Screen:
     background: DesignerObject # Rectangle
@@ -28,7 +29,7 @@ class World:
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
-    fish_speed: int
+    #fish_speed: int
 
 
 
@@ -37,7 +38,7 @@ def create_world() -> World:
     Creates the world with all necessary attributes of the World dataclass
     :return World: the game's world instance
     """
-    return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED, FISH_SPEED)
+    return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED)#, FISH_SPEED)
 
 def create_start_page() -> DesignerObject:
     """
@@ -167,43 +168,44 @@ def create_fish() -> DesignerObject:
         a_fish = emoji("tropical fish")
         a_fish.scale = 1.5
         if index < 4:
-            a_fish.y = randint(0, 20) + 80 * index
-            a_fish.x = randint(0, get_width() // 9)
+            a_fish.y = randint(0, 20) + 100 * index
+            a_fish.x = randint(0, get_width() // 9) + (index * 2)
             a_fish.flip_x = True
         else:
-            a_fish.y = randint(0, 20) + 80 * (8-index)
+            a_fish.y = randint(0, 20) + 100 * (8-index)
             a_fish.x = randint(get_width() - get_width() // 9, get_width())
         fish.append(a_fish)
     return fish
 
-def move_fish_horizontally(world: World):
+def move_fish(world: World):
     # direction matters (if it's flipped)
     for fish in world.fish:
-        fish.x += world.fish_speed
+        if fish.flip_x:
+            fish.x += FISH_SPEED
+        else:
+            fish.x -= FISH_SPEED
+    return
 
-def head_left(world: World):
-    world.fish_speed = -FISH_SPEED
-    for fish in world.fish:
-        fish.flip_x = False
 
-def head_right(world: World):
-    world.fish_speed = FISH_SPEED
-    for fish in world.fish:
-        fish.flip_x = True
 def bounce_fish(world: World):
     for fish in world.fish:
         if fish.x > get_width():
-            head_left(world)
+            fish.flip_x = False
         elif fish.x < 0:
-            head_right(world)
+            fish.flip_x = True
+    return
 
-
+def make_fish_fall(world: World):
+    for fish in world.fish:
+        fish.y += DOWN_SPEED
+    for element in world.aquatic_background.elements:
+        pass
 
 when('starting', create_world)
 when('typing', hide_start_page)
 when('typing', keys_down)
 when('done typing', keys_realeased)
 when('updating', set_direction)
-when("updating", move_fish_horizontally)
-#when("updating", bounce_fish)
+when("updating", move_fish)
+when("updating", bounce_fish)
 start()
