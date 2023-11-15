@@ -12,8 +12,8 @@ from random import randint
 """
 
 HOOK_SPEED = 10
-FISH_SPEED = 3
-DOWN_SPEED = 3
+FISH_SPEED = 5
+DOWN_SPEED = 5
 @dataclass
 class Screen:
     background: DesignerObject # Rectangle
@@ -22,6 +22,7 @@ class Screen:
 
 @dataclass
 class World:
+    start: bool
     aquatic_background: Screen
     hook: DesignerObject
     fish: list[DesignerObject]
@@ -38,7 +39,7 @@ def create_world() -> World:
     Creates the world with all necessary attributes of the World dataclass
     :return World: the game's world instance
     """
-    return World(create_background(), create_hook(), create_fish(), create_start_page(), False, False, HOOK_SPEED)#, FISH_SPEED)
+    return World(False, create_background(), create_hook(), [], create_start_page(), False, False, HOOK_SPEED)#, FISH_SPEED) #create_fish()
 
 def create_start_page() -> DesignerObject:
     """
@@ -53,6 +54,8 @@ def create_start_page() -> DesignerObject:
                          emoji("fish"),
                          text("black", "Press the space bar to play", 15, None,
                               get_height() * (3/4), "midtop", "CopperPlate")])
+    print(get_width())
+    print(get_height())
     return start_page
 
 def hide_start_page(world: World, key: str):
@@ -65,6 +68,7 @@ def hide_start_page(world: World, key: str):
         world.start_page.background.visible = False
         for element in world.start_page.elements:
             element.visible = False
+        world.start = True
     return
 
 def create_background() -> DesignerObject:
@@ -82,6 +86,7 @@ def create_hook() -> DesignerObject:
     hook = image("https://images.emojiterra.com/openmoji/v13.1/512px/1fa9d.png")
     shrink(hook, 3)
     hook.anchor = "midtop"
+    print(hook.y)
     return hook
 
 def move_hook(world: World, direction: int):
@@ -157,15 +162,15 @@ def keys_realeased(world: World, key: str):
     elif key == 'right':
         world.hook_move_right = False
     return
-
+"""
 def create_fish() -> DesignerObject:
-    """
+    ""
     Spawns 4 fish at random positions on the right and left sides of the window (8 fish total)
     :return DesignerObject: a list of 8 fish
-    """
+    ""
     fish = []
     for index, a_fish in enumerate(range(8)):
-        a_fish = emoji("tropical fish")
+        a_fish = emoji("fish") #tropical
         a_fish.scale = 1.5
         if index < 4:
             a_fish.y = randint(0, 20) + 100 * index
@@ -176,6 +181,32 @@ def create_fish() -> DesignerObject:
             a_fish.x = randint(get_width() - get_width() // 9, get_width())
         fish.append(a_fish)
     return fish
+"""
+def create_fish() -> DesignerObject:
+    a_fish = emoji("tropical fish")
+    a_fish.anchor = 'midbottom'
+    a_fish.scale = 1.5
+    a_fish.y = randint(0, 25) * 12
+    if randint(1, 2) == 2:
+        a_fish.x = 0
+        a_fish.flip_x = True
+    else:
+        a_fish.x = get_width()
+    return a_fish
+"""
+def make_fires(world: World):
+    not_too_many_fires = len(world.fires) <= 10
+    random_chance = randint(1, 100) == 1
+    if not_too_many_fires and random_chance:
+        world.fires.append(create_fire())
+"""
+def spawn_fish(world: World):
+    """ Create a new fish at random times, if there aren't enough fish """
+    not_too_many_fish = len(world.fish) < 10
+    random_chance = randint(1, 20) == 1
+    if not_too_many_fish and random_chance:
+        world.fish.append(create_fish())
+    return
 
 def move_fish(world: World):
     # direction matters (if it's flipped)
@@ -196,16 +227,36 @@ def bounce_fish(world: World):
     return
 
 def make_fish_fall(world: World):
+    if (world.start):
+        for fish in world.fish:
+            fish.y += DOWN_SPEED
+        for element in world.aquatic_background.elements:
+            element.y += DOWN_SPEED
+    return
+
+def wrap_fish(world: World):
     for fish in world.fish:
-        fish.y += DOWN_SPEED
-    for element in world.aquatic_background.elements:
-        pass
+        if fish.y > get_height() + 10:
+            fish.y = 0
+    return
+
+
+def start_animation(world: World):
+    if world.start:
+        move_fish(world)
+        bounce_fish(world)
+        make_fish_fall(world)
+        wrap_fish(world)
+        spawn_fish(world)
+    return
 
 when('starting', create_world)
 when('typing', hide_start_page)
 when('typing', keys_down)
 when('done typing', keys_realeased)
 when('updating', set_direction)
-when("updating", move_fish)
-when("updating", bounce_fish)
+when("updating", start_animation)
+#when("updating", move_fish)
+#when("updating", bounce_fish)
+#when("updating", make_fish_fall)
 start()
