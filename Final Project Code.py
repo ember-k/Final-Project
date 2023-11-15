@@ -4,9 +4,9 @@ from random import randint
 
 """
 # Phase 2
-- [ ] Fish move: fish move left and right across the screen while moving generally downwards
-- [ ] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
-- [ ] Screen limits: fish can't move off screen
+- [x] Fish move: fish move left and right across the screen while moving generally downwards
+- [x] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
+- [x] Screen limits: fish can't move off screen
 - [ ] fish collision: When the hook touches a fish, points are gained and the type & number of fish collisions are recorded.
 - [ ] Max collisions: Only a certain number of fish can be caught before the hook is full
 """
@@ -14,15 +14,20 @@ from random import randint
 HOOK_SPEED = 10
 FISH_SPEED = 5
 DOWN_SPEED = 5
+POINTS_PER_FISH = 50
+FISH_CAP = 10
+TIMER = 100
 @dataclass
 class Screen:
     background: DesignerObject # Rectangle
-    elements: list[DesignerObject] #text
+    elements: list[DesignerObject] #text, images, etc.
+
 
 
 @dataclass
 class World:
     start: bool
+    catch_zone: DesignerObject
     aquatic_background: Screen
     hook: DesignerObject
     fish: list[DesignerObject]
@@ -30,7 +35,9 @@ class World:
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
-    #fish_speed: int
+    score: int
+    time: int
+
 
 
 
@@ -39,7 +46,7 @@ def create_world() -> World:
     Creates the world with all necessary attributes of the World dataclass
     :return World: the game's world instance
     """
-    return World(False, create_background(), create_hook(), [], create_start_page(), False, False, HOOK_SPEED)#, FISH_SPEED) #create_fish()
+    return World(False, create_catch_zone(), create_background(), create_hook(), [], create_start_page(), False, False, HOOK_SPEED, 0, TIMER)
 
 def create_start_page() -> DesignerObject:
     """
@@ -54,8 +61,6 @@ def create_start_page() -> DesignerObject:
                          emoji("fish"),
                          text("black", "Press the space bar to play", 15, None,
                               get_height() * (3/4), "midtop", "CopperPlate")])
-    print(get_width())
-    print(get_height())
     return start_page
 
 def hide_start_page(world: World, key: str):
@@ -86,8 +91,17 @@ def create_hook() -> DesignerObject:
     hook = image("https://images.emojiterra.com/openmoji/v13.1/512px/1fa9d.png")
     shrink(hook, 3)
     hook.anchor = "midtop"
-    print(hook.y)
     return hook
+
+def create_catch_zone() -> DesignerObject:
+    return rectangle("deepskyblue", 10, 10)
+
+def adjust_catch_zone(world: World):
+    world.catch_zone.x = world.hook.x - 20
+    world.catch_zone.y = world.hook.y + world.hook.height * (3/4)
+    world.catch_zone.width = world.hook.width // 3
+    world.catch_zone.height = world.hook.height // 4
+    return
 
 def move_hook(world: World, direction: int):
     """
@@ -202,7 +216,7 @@ def make_fires(world: World):
 """
 def spawn_fish(world: World):
     """ Create a new fish at random times, if there aren't enough fish """
-    not_too_many_fish = len(world.fish) < 10
+    not_too_many_fish = len(world.fish) < 8
     random_chance = randint(1, 20) == 1
     if not_too_many_fish and random_chance:
         world.fish.append(create_fish())
@@ -240,6 +254,11 @@ def wrap_fish(world: World):
             fish.y = 0
     return
 
+def track_time(world: World):
+    world.time -= 1
+    if world.time <= 0:
+        pass #stop game and display stop screen
+    return
 
 def start_animation(world: World):
     if world.start:
@@ -248,7 +267,28 @@ def start_animation(world: World):
         make_fish_fall(world)
         wrap_fish(world)
         spawn_fish(world)
+        adjust_catch_zone(world)
+        track_time()
     return
+
+def fish_caught_by_hook(world: World):
+    caught_fish = []
+    for fish in world.fish:
+        if colliding(fish, world.catch_zone):
+            caught_fish.append(fish)
+            world.score += POINTS_PER_FISH
+    world.fish = destroy_caught_fish(world.fish, caught_fish)
+    return
+
+def destroy_caught_fish(original_list: list[DesignerObject], elements_to_destory: list[DesignerObject]) -> list[DesignerObject]:
+    remaining_fish = []
+    for item in original_list:
+        if item in elements_to_destory:
+            destroy(item)
+        else:
+            remaining_fish.append(item)
+    return remaining_fish
+
 
 when('starting', create_world)
 when('typing', hide_start_page)
@@ -256,6 +296,7 @@ when('typing', keys_down)
 when('done typing', keys_realeased)
 when('updating', set_direction)
 when("updating", start_animation)
+when("updating", fish_caught_by_hook)
 #when("updating", move_fish)
 #when("updating", bounce_fish)
 #when("updating", make_fish_fall)
