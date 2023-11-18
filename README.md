@@ -23,17 +23,19 @@ type of fish in addition to the number of fish caught.
 
 
 # Phase 2
-- [ ] Fish move: fish move left and right across the screen while moving generally downwards
-- [ ] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
-- [ ] Screen limits: fish can't move off screen
-- [ ] fish collision: When the hook touches a fish, points are gained and the type & number of fish collisions are recorded.
-- [ ] Max collisions: Only a certain number of fish can be caught before the hook is full
+- [x] Fish move: fish move left and right across the screen while moving generally downwards
+- [x] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
+- [x] Screen limits: fish can't move off screen
+- [x] Fish collision: When the hook touches a fish, points are gained and the type & number of fish collisions are recorded.
+- [x] Countdown Timer: Gameplay (fish and hook movement) stops after a certain amount of time has passed 
+(I replaced max collisions with countdown timer since it makes more sense for players to try to catch as many fish 
+as they can in a given amount of time, rather than have a cap on the number of fish they can catch)
 
 
 # Phase 3
 - [ ] Hooked Fish movement: When fish collide with the hook, they are relocated to align their movements with the hook.
   (They appear to be hanging on the hook and get dragged with the hook like in real fishing)
-- [ ] Water's Surace: After a certain amount of time, the surface of the water should descend from the top of the screen until it
+- [ ] Water's Surface: After a certain amount of time, the surface of the water should descend from the top of the screen until it
   collides with the hook, then the game pauses
 - [ ] End of Round: A message displays when the hook collides with the water's surface. The number and type of fish that were caught are
   displayed along with the total points that were earned
