@@ -2,19 +2,11 @@ from dataclasses import dataclass
 from designer import *
 from random import randint
 
-"""
-# Phase 2
-- [x] Fish move: fish move left and right across the screen while moving generally downwards
-- [x] fish wrap: if fish move down to the bottom of the screen, they wrap back to the top
-- [x] Screen limits: fish can't move off screen
-- [ ] fish collision: When the hook touches a fish, points are gained and the type & number of fish collisions are recorded.
-- [ ] Max collisions: Only a certain number of fish can be caught before the hook is full -> CHANGE TO A TIMER SYSTEM
-"""
 
 HOOK_SPEED = 10
 FISH_SPEED = 10
 DOWN_SPEED = 5
-POINTS_PER_FISH = 1
+POINTS_PER_FISH = 20
 FISH_CAUGHT_CAP = 10
 FISH_SPAWN_CAP = 7
 TIMER = 500
@@ -37,9 +29,8 @@ class World:
     hook_move_right: bool
     hook_speed: int
     score: int
+    caught_fish_num: int
     time: int
-
-
 
 
 def create_world() -> World:
@@ -48,7 +39,7 @@ def create_world() -> World:
     :return World: the game's world instance
     """
     return World(False, create_catch_zone(), create_background(), create_hook(), [], create_start_page(), False, False,
-                 HOOK_SPEED, 0, TIMER)
+                 HOOK_SPEED, 0, 0, TIMER)
 
 def create_start_page() -> DesignerObject:
     """
@@ -294,7 +285,7 @@ def fish_caught_by_hook(world: World):
         if colliding(fish, world.catch_zone):
             caught_fish.append(fish)
             world.score += POINTS_PER_FISH
-            print(world.score)
+            world.caught_fish_num += 1
     world.fish = destroy_caught_fish(world.fish, caught_fish)
     return
 
