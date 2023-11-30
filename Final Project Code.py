@@ -373,7 +373,29 @@ def destroy_caught_fish(all_fish: list[DesignerObject], caught_fish: list[Design
     return remaining_fish
 #"""
 
+def handle_end_event(game_world: GameScreen):
+    boat = game_world.sky_elements[1]
+    if game_world.time > 0 and not colliding(game_world.hook, boat):
+        for element in game_world.sky_elements:
+            element.y += 7
+    else:
+        game_world.play = False
+    return
 
+        #sky rectangle with a boat comes down from above
+#stops when it collides with the hook
+# play stops when it collides
+# Move to score screen
+
+def create_sky():
+    sky = image("https://www.shutterstock.com/image-vector/seamless-sky-daytime-illustration-600nw-359055326.jpg",
+                  None, -get_height(), anchor="center")
+    sky.scale = 1.4
+    boat = image("https://www.seekpng.com/png/full/832-8329486_fishing-boat-clipart-father-and-son-fishing-boat.png",
+                  None,-get_height(), anchor= "center")
+    boat.scale = .15
+    boat.y = sky.y + 180
+    return [sky, boat]
 
 when('starting: title', create_title_screen)
 when('clicking: title', title_screen_to_world)
@@ -392,6 +414,7 @@ when('typing', keys_down)
 when('done typing', keys_released)
 when("updating: game", start_animation)
 when("updating: game", fish_caught_by_hook)
+when("updating: game", handle_end_event)
 
 start()
 #debug(scene='title')
