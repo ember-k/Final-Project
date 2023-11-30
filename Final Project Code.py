@@ -10,12 +10,6 @@ POINTS_PER_FISH = 20
 FISH_CAUGHT_CAP = 10
 FISH_SPAWN_CAP = 7
 TIMER = 500
-"""
-@dataclass
-class Screen:
-    background: DesignerObject # Rectangle
-    elements: list[DesignerObject] #text, images, etc.
-"""
 
 @dataclass
 class Button:
@@ -40,6 +34,7 @@ def make_button(message: str, x: int, y: int) -> Button:
 class TitleScreen:
     background: list[DesignerObject]
     header: DesignerObject
+    fish:DesignerObject
     start_button: Button
     quit_button: Button
 
@@ -67,42 +62,34 @@ class GameScreen:
     score: int
     caught_fish_num: int
     time: int
+    sky_elements = list[DesignerObject]
 
 
-@dataclass
-class World:
-    start_page: TitleScreen
-    game_screen: GameScreen
-
-""""
-def create_world() -> World:
-    "
-    Creates the world with all necessary attributes of the World dataclass
-    :return World: the game's world instance
-    ""
-    return World(create_title_screen(), create_game_screen())
-"""
 
 def create_title_screen() -> TitleScreen:
     """
     Creates the start screen displaying the game's title
     :return DesignerObject: the start page
     """
+    fish = emoji("fish")
     return TitleScreen([rectangle("deepskyblue", get_width(), get_height()), rectangle("yellow", get_width() * 0.8, get_height() * 0.8)],
                        text("black", "THE FISHING GAME", 45, None, get_height() * (1/3),
                               "midbottom", "ComicSans"),
+                       fish,
                        make_button('Start', int(get_width() * 1/3), int(get_height() * 3/4)),
                        make_button('Quit', int(get_width() * 2/3), int(get_height() * 3/4)))
 
 def create_game_screen() -> GameScreen:
     """Creates and returns the aquatic background with water and kelp"""
+    hook_catch_zone = create_catch_zone()
+    hook_catch_zone.visible = False
     aquatic_background = [rectangle("deepskyblue", get_width(), get_height()),
                           image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png",
                               get_width() * 0.8, get_height() + 20),
                           image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png",
                               get_width() - get_width() * 0.82, get_height() + 20)]
-    return GameScreen(aquatic_background, True, create_catch_zone(), create_hook(), [], False, False, HOOK_SPEED, 0, 0,
-                      TIMER)
+    return GameScreen(aquatic_background, True, hook_catch_zone, create_hook(), [], False, False, HOOK_SPEED, 0, 0,
+                      TIMER, create_sky())
 
 
 """
@@ -147,9 +134,6 @@ def title_screen_to_world(title_world: TitleScreen):
         change_scene('game')
     if colliding_with_mouse(title_world.quit_button.background):
         quit()
-    return
-def play_game(game_world: GameScreen):
-    game_world.play = True
     return
 
 """
@@ -388,6 +372,7 @@ def destroy_caught_fish(all_fish: list[DesignerObject], caught_fish: list[Design
             remaining_fish.append(item)
     return remaining_fish
 #"""
+
 
 
 when('starting: title', create_title_screen)
