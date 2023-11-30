@@ -34,7 +34,7 @@ as they can in a given amount of time, rather than have a cap on the number of f
 
 
 # Phase 3
-- [ ] Hooked Fish movement: When fish collide with the hook, they are relocated to align their movements with the hook.
+- [x] Hooked Fish movement: When fish collide with the hook, they are relocated to align their movements with the hook.
   (They appear to be hanging on the hook and get dragged with the hook like in real fishing)
 - [ ] Water's Surface: After a certain amount of time, the surface of the water should descend from the top of the screen until it
   collides with the hook, then the game pauses

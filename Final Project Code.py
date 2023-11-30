@@ -10,12 +10,7 @@ POINTS_PER_FISH = 20
 FISH_CAUGHT_CAP = 10
 FISH_SPAWN_CAP = 7
 TIMER = 500
-"""
-@dataclass
-class Screen:
-    background: DesignerObject # Rectangle
-    elements: list[DesignerObject] #text, images, etc.
-"""
+
 
 @dataclass
 class Button:
@@ -40,6 +35,7 @@ def make_button(message: str, x: int, y: int) -> Button:
 class TitleScreen:
     background: list[DesignerObject]
     header: DesignerObject
+    fish: DesignerObject
     start_button: Button
     quit_button: Button
 
@@ -56,9 +52,9 @@ class ScoreScreen:
 
 @dataclass
 class GameScreen:
+    catch_zone: DesignerObject
     aquatic_background: list[DesignerObject]
     play: bool
-    catch_zone: DesignerObject
     hook: DesignerObject
     fish: list[DesignerObject]
     hook_move_left: bool
@@ -67,14 +63,18 @@ class GameScreen:
     score: int
     caught_fish_num: int
     time: int
+    sky_elements: list[DesignerObject]
 
 
+
+
+""""
 @dataclass
 class World:
     start_page: TitleScreen
     game_screen: GameScreen
 
-""""
+
 def create_world() -> World:
     "
     Creates the world with all necessary attributes of the World dataclass
@@ -91,18 +91,21 @@ def create_title_screen() -> TitleScreen:
     return TitleScreen([rectangle("deepskyblue", get_width(), get_height()), rectangle("yellow", get_width() * 0.8, get_height() * 0.8)],
                        text("black", "THE FISHING GAME", 45, None, get_height() * (1/3),
                               "midbottom", "ComicSans"),
+                       emoji("fish"),
                        make_button('Start', int(get_width() * 1/3), int(get_height() * 3/4)),
                        make_button('Quit', int(get_width() * 2/3), int(get_height() * 3/4)))
 
 def create_game_screen() -> GameScreen:
     """Creates and returns the aquatic background with water and kelp"""
+    hook_catch_zone = create_catch_zone()
+    hook_catch_zone.visible = False
     aquatic_background = [rectangle("deepskyblue", get_width(), get_height()),
                           image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png",
                               get_width() * 0.8, get_height() + 20),
                           image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png",
                               get_width() - get_width() * 0.82, get_height() + 20)]
-    return GameScreen(aquatic_background, True, create_catch_zone(), create_hook(), [], False, False, HOOK_SPEED, 0, 0,
-                      TIMER)
+    return GameScreen(hook_catch_zone, aquatic_background, True, create_hook(), [], False, False, HOOK_SPEED, 0, 0,
+                      TIMER, create_sky())
 
 
 """
@@ -147,9 +150,6 @@ def title_screen_to_world(title_world: TitleScreen):
         change_scene('game')
     if colliding_with_mouse(title_world.quit_button.background):
         quit()
-    return
-def play_game(game_world: GameScreen):
-    game_world.play = True
     return
 
 """
@@ -338,8 +338,6 @@ def track_time(game_world: GameScreen):
     :param game_world: the game's world instance
     """
     game_world.time -= 1
-    if game_world.time <= 0:
-        game_world.play = False
     return
 
 def start_animation(game_world: GameScreen):
@@ -389,6 +387,30 @@ def destroy_caught_fish(all_fish: list[DesignerObject], caught_fish: list[Design
     return remaining_fish
 #"""
 
+def handle_end_event(game_world: GameScreen):
+    boat = game_world.sky_elements[1]
+    if game_world.time > 0 and not colliding(game_world.hook, boat):
+        for element in game_world.sky_elements:
+            element.y += 7
+    else:
+        game_world.play = False
+    return
+
+        #sky rectangle with a boat comes down from above
+#stops when it collides with the hook
+# play stops when it collides
+# Move to score screen
+
+def create_sky():
+    sky = image("https://www.shutterstock.com/image-vector/seamless-sky-daytime-illustration-600nw-359055326.jpg",
+                  None, -get_height(), anchor="center")
+    sky.scale = 1.4
+    boat = image("https://www.seekpng.com/png/full/832-8329486_fishing-boat-clipart-father-and-son-fishing-boat.png",
+                  None,-get_height(), anchor= "center")
+    boat.scale = .15
+    boat.y = sky.y + 180
+    return [sky, boat]
+
 
 when('starting: title', create_title_screen)
 when('clicking: title', title_screen_to_world)
@@ -407,6 +429,7 @@ when('typing', keys_down)
 when('done typing', keys_released)
 when("updating: game", start_animation)
 when("updating: game", fish_caught_by_hook)
+when("updating: game", handle_end_event)
 
 start()
 #debug(scene='title')
