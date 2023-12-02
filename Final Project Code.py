@@ -26,7 +26,7 @@ def make_button(message: str, x: int, y: int) -> Button:
     horizontal_padding = 5
     vertical_padding = 3
     label = text("black", message, 20, x, y, layer='top')
-    label.font = "ComicSans"
+    label.font = "CopperPlate"
     return Button(rectangle("deepskyblue", label.width + horizontal_padding, label.height + vertical_padding, x, y),
                   rectangle("black", label.width + horizontal_padding, label.height + vertical_padding, x, y, 1),
                   label)
@@ -41,12 +41,13 @@ class TitleScreen:
 
 @dataclass
 class ScoreScreen:
+    background: list[DesignerObject]
     fish_count: DesignerObject
     fish_emoji: DesignerObject
-    player_score: DesignerObject
-    high_score: DesignerObject
-    start_message: DesignerObject
-    #quit_button: Button
+    start_button: Button
+    quit_button: Button
+    player_score: int
+    high_score: int
 
 
 
@@ -62,28 +63,11 @@ class GameScreen:
     hook_move_right: bool
     hook_speed: int
     score: int
-    high_score: int
+    high_score: int # maybe put this in score screen and pause/update every time.
     caught_fish_num: int
     time: int
     sky_elements: list[DesignerObject]
 
-
-
-
-""""
-@dataclass
-class World:
-    start_page: TitleScreen
-    game_screen: GameScreen
-
-
-def create_world() -> World:
-    "
-    Creates the world with all necessary attributes of the World dataclass
-    :return World: the game's world instance
-    ""
-    return World(create_title_screen(), create_game_screen())
-"""
 
 def create_title_screen() -> TitleScreen:
     """
@@ -108,7 +92,25 @@ def create_game_screen() -> GameScreen:
                               get_width() - get_width() * 0.82, get_height() + 20)]
     return GameScreen(hook_catch_zone, aquatic_background, True, create_hook(), [], [], False, False, HOOK_SPEED, 0, 0,
                       0, TIMER, create_sky())
-
+"""
+@dataclass
+class ScoreScreen:
+    fish_count: DesignerObject
+    fish_emoji: DesignerObject
+    player_score: DesignerObject
+    high_score: DesignerObject
+    start_button: Button
+    quit_button: Button
+"""
+def create_score_screen() -> ScoreScreen:
+    return ScoreScreen([rectangle("deepskyblue", get_width(), get_height()),
+                        rectangle("yellow", get_width() * 0.8, get_height() * 0.8)],
+                       text("black", "You caught " + "0" + " fish!", 45, None, get_height() * (1 / 3),
+                            "midbottom", "ComicSans"),
+                       emoji("fish"),
+                       make_button('Start', int(get_width() * 1 / 3), int(get_height() * 3 / 4)),
+                       make_button('Quit', int(get_width() * 2 / 3), int(get_height() * 3 / 4)),
+                       0, 0)
 
 """
 def create_start_page() -> DesignerObject:
@@ -141,7 +143,7 @@ def hide_start_page(world: World, key: str):
     return
     """
 
-def title_screen_to_world(title_world: TitleScreen):
+def title_screen_to_game(title_world: TitleScreen):
     """
     Buttons are pretty easy, just use the `clicking` event with the `colliding_with_mouse` function.
 
@@ -151,6 +153,29 @@ def title_screen_to_world(title_world: TitleScreen):
     if colliding_with_mouse(title_world.start_button.background):
         change_scene('game')
     if colliding_with_mouse(title_world.quit_button.background):
+        quit()
+    return
+
+def game_to_score_screen(game_world: GameScreen):
+    """
+    Buttons are pretty easy, just use the `clicking` event with the `colliding_with_mouse` function.
+
+    The change_scene(scene_name) function can be used to change scenes. This will call the relevant
+    `"starting: scene_name"` function and create the new scene.
+    """
+    change_scene('score')
+    return
+
+def score_screen_to_game(score_screen: ScoreScreen):
+    """
+    Buttons are pretty easy, just use the `clicking` event with the `colliding_with_mouse` function.
+
+    The change_scene(scene_name) function can be used to change scenes. This will call the relevant
+    `"starting: scene_name"` function and create the new scene.
+    """
+    if colliding_with_mouse(score_screen.start_button.background):
+        change_scene('game')
+    if colliding_with_mouse(score_screen.quit_button.background):
         quit()
     return
 
@@ -405,7 +430,7 @@ def move_sky_at_end(game_world: GameScreen):
             for element in game_world.sky_elements:
                 element.y += 7
             else:
-                game_world.play = False
+                game_to_score_screen(game_world)
     return
 
 def create_sky():
@@ -420,9 +445,11 @@ def create_sky():
 
 
 when('starting: title', create_title_screen)
-when('clicking: title', title_screen_to_world)
+when('clicking: title', title_screen_to_game)
 when('starting: game', create_game_screen)
-#when('clicking: game', handle_setup_buttons)
+when('starting: score', create_score_screen)
+when('clicking: score', score_screen_to_game)
+
 """
 #when('starting: setup', create_setup_screen)
 #when('clicking: setup', handle_setup_buttons)
