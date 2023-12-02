@@ -10,6 +10,7 @@ POINTS_PER_FISH = 20
 FISH_CAUGHT_CAP = 10
 FISH_SPAWN_CAP = 8
 TIMER = 500
+SCENE_DELAY = 65
 
 
 @dataclass
@@ -42,11 +43,12 @@ class TitleScreen:
 @dataclass
 class ScoreScreen:
     background: list[DesignerObject]
-    fish_count: DesignerObject
+    fish_count_message: DesignerObject
     fish_emoji: DesignerObject
+    high_score_message: DesignerObject
     start_button: Button
     quit_button: Button
-    player_score: int
+    caught_fish_num: int
     high_score: int
 
 
@@ -67,6 +69,7 @@ class GameScreen:
     caught_fish_num: int
     time: int
     sky_elements: list[DesignerObject]
+    scene_delay: int
 
 
 def create_title_screen() -> TitleScreen:
@@ -91,26 +94,23 @@ def create_game_screen() -> GameScreen:
                           image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png",
                               get_width() - get_width() * 0.82, get_height() + 20)]
     return GameScreen(hook_catch_zone, aquatic_background, True, create_hook(), [], [], False, False, HOOK_SPEED, 0, 0,
-                      0, TIMER, create_sky())
-"""
-@dataclass
-class ScoreScreen:
-    fish_count: DesignerObject
-    fish_emoji: DesignerObject
-    player_score: DesignerObject
-    high_score: DesignerObject
-    start_button: Button
-    quit_button: Button
-"""
-def create_score_screen() -> ScoreScreen:
+                      0, TIMER, create_sky(), SCENE_DELAY)
+
+def create_score_screen(caught_fish_num: int) -> ScoreScreen:
     return ScoreScreen([rectangle("deepskyblue", get_width(), get_height()),
                         rectangle("yellow", get_width() * 0.8, get_height() * 0.8)],
-                       text("black", "You caught " + "0" + " fish!", 45, None, get_height() * (1 / 3),
+                       text("black", "You caught " + str(caught_fish_num) + " fish!", 45, None, get_height() * (1 / 3),
                             "midbottom", "ComicSans"),
                        emoji("fish"),
+                       text("black", "High Score: " + str(caught_fish_num) + "fish!", 30, None, get_height() * (1 / 3),
+                            "midbottom", "ComicSans"),
                        make_button('Start', int(get_width() * 1 / 3), int(get_height() * 3 / 4)),
                        make_button('Quit', int(get_width() * 2 / 3), int(get_height() * 3 / 4)),
-                       0, 0)
+                       caught_fish_num, caught_fish_num)
+
+def game_to_score_screen(game_world: GameScreen):
+    change_scene('score', game_world.caught_fish_num)
+    return
 
 """
 def create_start_page() -> DesignerObject:
@@ -145,10 +145,6 @@ def hide_start_page(world: World, key: str):
 
 def title_screen_to_game(title_world: TitleScreen):
     """
-    Buttons are pretty easy, just use the `clicking` event with the `colliding_with_mouse` function.
-
-    The change_scene(scene_name) function can be used to change scenes. This will call the relevant
-    `"starting: scene_name"` function and create the new scene.
     """
     if colliding_with_mouse(title_world.start_button.background):
         change_scene('game')
@@ -156,15 +152,7 @@ def title_screen_to_game(title_world: TitleScreen):
         quit()
     return
 
-def game_to_score_screen(game_world: GameScreen):
-    """
-    Buttons are pretty easy, just use the `clicking` event with the `colliding_with_mouse` function.
 
-    The change_scene(scene_name) function can be used to change scenes. This will call the relevant
-    `"starting: scene_name"` function and create the new scene.
-    """
-    change_scene('score')
-    return
 
 def score_screen_to_game(score_screen: ScoreScreen):
     """
@@ -430,7 +418,18 @@ def move_sky_at_end(game_world: GameScreen):
             for element in game_world.sky_elements:
                 element.y += 7
             else:
-                game_to_score_screen(game_world)
+                delay_screen_switch(game_world)
+    return
+
+def delay_screen_switch(game_world: GameScreen):
+    """
+    Stops gameplay when the timer has counted down to 0
+    :param game_world: the game's world instance
+    """
+    if game_world.scene_delay <= 0:
+        game_to_score_screen(game_world)
+    else:
+        game_world.scene_delay -= 1
     return
 
 def create_sky():
