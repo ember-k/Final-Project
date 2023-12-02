@@ -8,7 +8,7 @@ FISH_SPEED = 10
 DOWN_SPEED = 5
 POINTS_PER_FISH = 20
 FISH_CAUGHT_CAP = 10
-FISH_SPAWN_CAP = 7
+FISH_SPAWN_CAP = 8
 TIMER = 500
 
 
@@ -281,7 +281,7 @@ def spawn_fish(game_world: GameScreen):
     :param game_world: the game's world instance
     """
     not_too_many_fish = len(game_world.fish) < FISH_SPAWN_CAP
-    random_chance = randint(1, 20) == 1
+    random_chance = randint(1, 15) == 1
     if not_too_many_fish and random_chance:
         game_world.fish.append(create_fish())
     return
@@ -338,6 +338,8 @@ def track_time(game_world: GameScreen):
     :param game_world: the game's world instance
     """
     game_world.time -= 1
+    if game_world.time <= 0:
+        game_world.play = False
     return
 
 def start_animation(game_world: GameScreen):
@@ -348,11 +350,8 @@ def start_animation(game_world: GameScreen):
     """
     if game_world.play:
         set_hook_direction(game_world)
-        move_fish_horizontally(game_world)
-        bounce_fish(game_world)
-        make_fish_fall(game_world)
-        wrap_fish(game_world)
         spawn_fish(game_world)
+        wrap_fish(game_world)
         adjust_catch_zone(game_world)
         track_time(game_world)
     return
@@ -385,21 +384,17 @@ def destroy_caught_fish(all_fish: list[DesignerObject], caught_fish: list[Design
         else:
             remaining_fish.append(item)
     return remaining_fish
-#"""
 
-def handle_end_event(game_world: GameScreen):
+def move_sky_at_end(game_world: GameScreen):
+    sky = game_world.sky_elements[0]
     boat = game_world.sky_elements[1]
-    if game_world.time > 0 and not colliding(game_world.hook, boat):
-        for element in game_world.sky_elements:
-            element.y += 7
-    else:
-        game_world.play = False
+    if game_world.time <= 25:
+        if not colliding(game_world.catch_zone, boat) and not colliding(game_world.hook, sky):
+            for element in game_world.sky_elements:
+                element.y += 7
+            else:
+                game_world.play = False
     return
-
-        #sky rectangle with a boat comes down from above
-#stops when it collides with the hook
-# play stops when it collides
-# Move to score screen
 
 def create_sky():
     sky = image("https://www.shutterstock.com/image-vector/seamless-sky-daytime-illustration-600nw-359055326.jpg",
@@ -428,8 +423,12 @@ when('entering: overworld', resume_from_pause)
 when('typing', keys_down)
 when('done typing', keys_released)
 when("updating: game", start_animation)
+when('updating: game', move_fish_horizontally)
 when("updating: game", fish_caught_by_hook)
-when("updating: game", handle_end_event)
+when("updating: game", move_sky_at_end)
+when("updating: game", bounce_fish)
+when("updating: game", make_fish_fall)
+
 
 start()
 #debug(scene='title')
