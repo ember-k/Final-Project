@@ -57,10 +57,12 @@ class GameScreen:
     play: bool
     hook: DesignerObject
     fish: list[DesignerObject]
+    caught_fish: list[DesignerObject]
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
     score: int
+    high_score: int
     caught_fish_num: int
     time: int
     sky_elements: list[DesignerObject]
@@ -104,8 +106,8 @@ def create_game_screen() -> GameScreen:
                               get_width() * 0.8, get_height() + 20),
                           image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png",
                               get_width() - get_width() * 0.82, get_height() + 20)]
-    return GameScreen(hook_catch_zone, aquatic_background, True, create_hook(), [], False, False, HOOK_SPEED, 0, 0,
-                      TIMER, create_sky())
+    return GameScreen(hook_catch_zone, aquatic_background, True, create_hook(), [], [], False, False, HOOK_SPEED, 0, 0,
+                      0, TIMER, create_sky())
 
 
 """
@@ -367,12 +369,13 @@ def fish_caught_by_hook(game_world: GameScreen):
             caught_fish.append(fish)
             game_world.score += POINTS_PER_FISH
             game_world.caught_fish_num += 1
-    game_world.fish = destroy_caught_fish(game_world.fish, caught_fish)
+    game_world.fish = destroy_caught_fish(game_world, game_world.fish, caught_fish)
     return
 
-def destroy_caught_fish(all_fish: list[DesignerObject], caught_fish: list[DesignerObject]) -> list[DesignerObject]:
+def destroy_caught_fish(game_world: GameScreen, all_fish: list[DesignerObject], caught_fish: list[DesignerObject]) -> list[DesignerObject]:
     """
     Helper function that destroys fish that have been caught by the hook
+    :param game_world =-----------------------------------------------------------------------------------------------------------
     :param all_fish: the original list of fish (both caught fish and free fish)
     :param caught_fish: a list of fish that have been caught by the hook
     :return remaining fish: returns only the fish that haven't been caught
@@ -380,10 +383,19 @@ def destroy_caught_fish(all_fish: list[DesignerObject], caught_fish: list[Design
     remaining_fish = []
     for item in all_fish:
         if item in caught_fish:
-            destroy(item)
+            game_world.caught_fish.append(item)
         else:
             remaining_fish.append(item)
     return remaining_fish
+
+
+def position_caught_fish_on_hook(game_world: GameScreen):
+    if game_world.caught_fish:
+        for fish in game_world.caught_fish:
+            fish.angle = -90
+            fish.x = randint(game_world.catch_zone.x - 1, game_world.catch_zone.x + 16)
+            fish.y = game_world.catch_zone.y + game_world.catch_zone.height
+    return
 
 def move_sky_at_end(game_world: GameScreen):
     sky = game_world.sky_elements[0]
@@ -424,10 +436,12 @@ when('typing', keys_down)
 when('done typing', keys_released)
 when("updating: game", start_animation)
 when('updating: game', move_fish_horizontally)
-when("updating: game", fish_caught_by_hook)
-when("updating: game", move_sky_at_end)
 when("updating: game", bounce_fish)
 when("updating: game", make_fish_fall)
+when("updating: game", fish_caught_by_hook)
+when("updating: game", position_caught_fish_on_hook)
+when("updating: game", move_sky_at_end)
+
 
 
 start()
