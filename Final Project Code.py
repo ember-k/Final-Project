@@ -10,7 +10,7 @@ POINTS_PER_FISH = 20
 FISH_CAUGHT_CAP = 10
 FISH_SPAWN_CAP = 8
 TIMER = 500
-SCENE_DELAY = 65
+SCENE_DELAY = 60
 
 
 @dataclass
@@ -24,8 +24,8 @@ class Button:
     label: DesignerObject
 
 def make_button(message: str, x: int, y: int) -> Button:
-    horizontal_padding = 5
-    vertical_padding = 3
+    horizontal_padding = 10
+    vertical_padding = 8
     label = text("black", message, 20, x, y, layer='top')
     label.font = "CopperPlate"
     return Button(rectangle("deepskyblue", label.width + horizontal_padding, label.height + vertical_padding, x, y),
@@ -48,7 +48,7 @@ class ScoreScreen:
     high_score_message: DesignerObject
     start_button: Button
     quit_button: Button
-    caught_fish_num: int
+    #caught_fish_num: int
     high_score: int
 
 
@@ -64,12 +64,12 @@ class GameScreen:
     hook_move_left: bool
     hook_move_right: bool
     hook_speed: int
-    score: int
-    high_score: int # maybe put this in score screen and pause/update every time.
+    high_score: int
     caught_fish_num: int
     time: int
     sky_elements: list[DesignerObject]
     scene_delay: int
+
 
 
 def create_title_screen() -> TitleScreen:
@@ -84,7 +84,7 @@ def create_title_screen() -> TitleScreen:
                        make_button('Start', int(get_width() * 1/3), int(get_height() * 3/4)),
                        make_button('Quit', int(get_width() * 2/3), int(get_height() * 3/4)))
 
-def create_game_screen() -> GameScreen:
+def create_game_screen(high_score: int) -> GameScreen:
     """Creates and returns the aquatic background with water and kelp"""
     hook_catch_zone = create_catch_zone()
     hook_catch_zone.visible = False
@@ -93,23 +93,29 @@ def create_game_screen() -> GameScreen:
                               get_width() * 0.8, get_height() + 20),
                           image("https://clipart-library.com/images_k/seaweed-transparent-background/seaweed-transparent-background-2.png",
                               get_width() - get_width() * 0.82, get_height() + 20)]
-    return GameScreen(hook_catch_zone, aquatic_background, True, create_hook(), [], [], False, False, HOOK_SPEED, 0, 0,
-                      0, TIMER, create_sky(), SCENE_DELAY)
+    return GameScreen(hook_catch_zone, aquatic_background, True, create_hook(), [], [], False, False, HOOK_SPEED, high_score, 0,
+                      TIMER, create_sky(), SCENE_DELAY)
 
-def create_score_screen(caught_fish_num: int) -> ScoreScreen:
+def create_score_screen(caught_fish_num: int, high_score: int) -> ScoreScreen:
     return ScoreScreen([rectangle("deepskyblue", get_width(), get_height()),
                         rectangle("yellow", get_width() * 0.8, get_height() * 0.8)],
                        text("black", "You caught " + str(caught_fish_num) + " fish!", 45, None, get_height() * (1 / 3),
                             "midbottom", "ComicSans"),
                        emoji("fish"),
-                       text("black", "High Score: " + str(caught_fish_num) + "fish!", 30, None, get_height() * (1 / 3),
+                       text("black", "High Score: " + str(high_score) + " fish", 30, None, get_height() * (2 / 3),
                             "midbottom", "ComicSans"),
                        make_button('Start', int(get_width() * 1 / 3), int(get_height() * 3 / 4)),
                        make_button('Quit', int(get_width() * 2 / 3), int(get_height() * 3 / 4)),
-                       caught_fish_num, caught_fish_num)
+                       high_score)
 
+def check_high_score(current_score: int, high_score: int):
+    if current_score > high_score:
+        return current_score
+    else:
+        return high_score
 def game_to_score_screen(game_world: GameScreen):
-    change_scene('score', game_world.caught_fish_num)
+    higher_score = check_high_score(game_world.caught_fish_num, game_world.high_score)
+    change_scene('score', caught_fish_num=game_world.caught_fish_num, high_score=higher_score)
     return
 
 """
@@ -147,7 +153,7 @@ def title_screen_to_game(title_world: TitleScreen):
     """
     """
     if colliding_with_mouse(title_world.start_button.background):
-        change_scene('game')
+        change_scene('game', high_score=0)
     if colliding_with_mouse(title_world.quit_button.background):
         quit()
     return
@@ -162,7 +168,7 @@ def score_screen_to_game(score_screen: ScoreScreen):
     `"starting: scene_name"` function and create the new scene.
     """
     if colliding_with_mouse(score_screen.start_button.background):
-        change_scene('game')
+        change_scene('game', high_score=score_screen.high_score)
     if colliding_with_mouse(score_screen.quit_button.background):
         quit()
     return
@@ -380,7 +386,6 @@ def fish_caught_by_hook(game_world: GameScreen):
     for fish in game_world.fish:
         if colliding(fish, game_world.catch_zone):
             caught_fish.append(fish)
-            game_world.score += POINTS_PER_FISH
             game_world.caught_fish_num += 1
     game_world.fish = destroy_caught_fish(game_world, game_world.fish, caught_fish)
     return
@@ -417,8 +422,8 @@ def move_sky_at_end(game_world: GameScreen):
         if not colliding(game_world.catch_zone, boat) and not colliding(game_world.hook, sky):
             for element in game_world.sky_elements:
                 element.y += 7
-            else:
-                delay_screen_switch(game_world)
+        else:
+            delay_screen_switch(game_world)
     return
 
 def delay_screen_switch(game_world: GameScreen):
