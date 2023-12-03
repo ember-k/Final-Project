@@ -36,11 +36,11 @@ as they can in a given amount of time, rather than have a cap on the number of f
 # Phase 3
 - [x] Hooked Fish movement: When fish collide with the hook, they are relocated to align their movements with the hook.
   (They appear to be hanging on the hook and get dragged with the hook like in real fishing)
-- [ ] Water's Surface: After a certain amount of time, the surface of the water should descend from the top of the screen until it
+- [x] Water's Surface: After a certain amount of time, the surface of the water should descend from the top of the screen until it
   collides with the hook, then the game pauses
-- [ ] End of Round: A message displays when the hook collides with the water's surface. The number and type of fish that were caught are
-  displayed along with the total points that were earned
-- [ ] Update Play screen: Play screen is updated with cumulative points and the player is given the option to play another round.
+- [x] End of Round: A message displays when the hook collides with the water's surface. The number and type of fish that were caught are
+  displayed along with the updated high score.
+- [x] Next round option: The high score is kept track of between rounds and the player is given the option to play another round.
 - [ ] (Nice to have) Rare fish: rare fish are added that are smaller and/or move across the screen faster which are worth extra points
 - [ ] (Nice to have) Hook animation: animation of the hook descending after the start screen disappears
 - [ ] (Nice to have) Drag the Hook: Instead of using arrow keys I can have the hook follow where the player drags the mouse
