@@ -3,9 +3,9 @@ from designer import *
 from random import randint
 
 
-HOOK_SPEED = 10
-FISH_SPEED = 10
-DOWN_SPEED = 5
+HOOK_SPEED = 11
+FISH_SPEED = 11
+DOWN_SPEED = 4
 POINTS_PER_FISH = 20
 FISH_CAUGHT_CAP = 10
 FISH_SPAWN_CAP = 8
@@ -421,7 +421,7 @@ def move_sky_at_end(game_world: GameScreen):
     if game_world.time <= 25:
         if not colliding(game_world.catch_zone, boat) and not colliding(game_world.hook, sky):
             for element in game_world.sky_elements:
-                element.y += 7
+                element.y += 5
         else:
             delay_screen_switch(game_world)
     return
