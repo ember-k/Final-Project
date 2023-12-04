@@ -10,7 +10,7 @@ reeled back to the surface.
 
 
 ## Preview
-Full game preview Youtube link:
+Full game preview Youtube link: https://youtu.be/-eUGspzoKzo
 
 ## Instructions
 1. Once the title screen appears, the player clicks either "quit" to stop or "start" to begin the game
@@ -56,6 +56,7 @@ as they can in a given amount of time, rather than have a cap on the number of f
 
 
 ### Phase 3
+**Phase 3 YouTube Link: https://youtu.be/2EuykoLq4YQ**
 - [x] Hooked Fish movement: When fish collide with the hook, they are relocated to align their movements with the hook.
   (They appear to be hanging on the hook and get dragged with the hook like in real fishing)
 - [x] Water's Surface: After a certain amount of time, the surface of the water should descend from the top of the screen until it
